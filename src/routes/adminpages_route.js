@@ -116,5 +116,80 @@ router.post('/reorder-pages', async function (req, res) {
     });
 
 });
+// GET edit page
+router.get('/edit-page/:id', async function (req, res) {
+    try {
+        const page = await Page.findById(req.params.id);
+        res.render('admin/edit_page', {
+            title: page.title,
+            slug: page.slug,
+            content: page.content,
+            id: page._id
+        });
+    } catch (err) {
+        console.log(err);
+        // Xử lý lỗi tại đây nếu cần
+    }
+});
+
+/*
+ * POST edit page
+ */
+router.post('/edit-page/:id', [
+    body('title').notEmpty().withMessage('Title must have a value.'),
+    body('content').notEmpty().withMessage('Content must have a value.')
+], async function (req, res) {
+    const errors = validationResult(req);
+    const id = req.params.id;
+
+    if (!errors.isEmpty()) {
+        const errorArray = errors.array();
+        res.render('admin/edit_page', {
+            errors: errorArray,
+            title: req.body.title,
+            slug: req.body.slug,
+            content: req.body.content,
+            id: id
+        });
+    } else {
+        try {
+            const page = await Page.findById(id);
+            if (!page) {
+                return res.status(404).send('Page not found');
+            }
+
+            const slug = req.body.slug.replace(/\s+/g, '-').toLowerCase() || req.body.title.replace(/\s+/g, '-').toLowerCase();
+            const title = req.body.title;
+            const content = req.body.content;
+
+            const existingPage = await Page.findOne({ slug: slug, _id: { '$ne': id } });
+
+            if (existingPage) {
+                req.flash('danger', 'Page slug exists, choose another.');
+                return res.render('admin/edit_page', {
+                    title: title,
+                    slug: slug,
+                    content: content,
+                    id: id
+                });
+            }
+
+            page.title = title;
+            page.slug = slug;
+            page.content = content;
+
+            await page.save();
+
+            const pages = await Page.find({}).sort({ sorting: 1 });
+            req.app.locals.pages = pages;
+
+            req.flash('success', 'Page edited!');
+            res.redirect('/admin/pages');
+        } catch (err) {
+            console.error(err);
+            // Xử lý lỗi tại đây nếu cần
+        }
+    }
+});
 
 module.exports = router;
