@@ -11,7 +11,8 @@ const configViewEngine = (app) => {
     app.set('views', path.join('src', 'views'));
     app.set('view engine', 'ejs');
     app.use(bodyParser.urlencoded({ extended: false }));
-
+    // Set global errors variable
+    app.locals.errors = null;
     // parse application/json
     app.use(bodyParser.json())
 
