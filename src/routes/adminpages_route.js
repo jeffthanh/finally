@@ -192,4 +192,27 @@ router.post('/edit-page/:id', [
     }
 });
 
+
+// GET delete page
+router.get('/delete-page/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const deletedPage = await Page.findByIdAndRemove(id);
+        
+        if (!deletedPage) {
+            return res.status(404).send('Page not found');
+        }
+        
+        const pages = await Page.find({}).sort({ sorting: 1 }).exec();
+        req.app.locals.pages = pages;
+        
+        req.flash('success', 'Page deleted!');
+        res.redirect('/admin/pages');
+    } catch (err) {
+        console.error(err);
+        // Xử lý lỗi tại đây nếu cần
+    }
+});
+
+
 module.exports = router;

@@ -5,7 +5,6 @@ const dotenv = require("dotenv");
 dotenv.config();
 const mongoose = require('mongoose');
 const pages = require("./src/routes/pages_route");
-const adminpages = require("./src/routes/adminpages_route");
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URL)
@@ -22,7 +21,6 @@ configViewEngine(app);
 
 // Set router
 app.use('/', pages);
-app.use('/admin/pages', adminpages);
 app.listen(port, () => {
     console.log(`Server app listening on port ${port}`)
 });

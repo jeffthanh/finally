@@ -3,6 +3,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const session = require("express-session");
 const { body, validationResult } = require('express-validator'); // Sử dụng destructuring
+const adminpages = require("../routes/adminpages_route");
+const admincategory = require("../routes/admincategory_router");
+const fileUpload = require('express-fileupload');
+const adminProducts = require('../routes/adminproduct_router');
+
 
 const configViewEngine = (app) => {
     //config static files
@@ -11,6 +16,11 @@ const configViewEngine = (app) => {
     app.set('views', path.join('src', 'views'));
     app.set('view engine', 'ejs');
     app.use(bodyParser.urlencoded({ extended: false }));
+
+    // Express fileUpload middleware
+    app.use(fileUpload());
+
+
     // Set global errors variable
     app.locals.errors = null;
     // parse application/json
@@ -39,11 +49,18 @@ const configViewEngine = (app) => {
         // Nếu không có lỗi, xử lý dữ liệu và thực hiện hành động cần thiết
         // ...
     });
+    // Serve static files from the 'public' directory
+    app.use(express.static('public'));
+
     app.use(require('connect-flash')());
     app.use(function (req, res, next) {
         res.locals.messages = require('express-messages')(req, res);
         next();
     });
+    app.use('/admin/pages', adminpages);
+    app.use('/admin/categories', admincategory);
+    app.use('/admin/products', adminProducts);
+
 }
 
 module.exports = configViewEngine;
