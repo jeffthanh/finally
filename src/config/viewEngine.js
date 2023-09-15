@@ -7,7 +7,7 @@ const adminpages = require("../routes/adminpages_route");
 const admincategory = require("../routes/admincategory_router");
 const fileUpload = require('express-fileupload');
 const adminProducts = require('../routes/adminproduct_router');
-
+const Page = require("../models/page")
 
 const configViewEngine = (app) => {
     //config static files
@@ -49,6 +49,15 @@ const configViewEngine = (app) => {
         // Nếu không có lỗi, xử lý dữ liệu và thực hiện hành động cần thiết
         // ...
     });
+    // Get all pages to pass to header.ejs
+    Page.find({}).sort({ sorting: 1 }).then((pages) => {
+        app.locals.pages = pages;
+    }).catch((err) => {
+        console.error(err);
+        // Xử lý lỗi nếu cần
+    });
+    
+    
     // Serve static files from the 'public' directory
     app.use(express.static('public'));
 
