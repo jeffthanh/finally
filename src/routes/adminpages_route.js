@@ -70,7 +70,7 @@ router.post('/add-page', validateFields, async function (req, res) {
                 title: title,
                 slug: slug,
                 content: content,
-                sorting: 100
+                sorting: 0
             });
 
             await newPage.save();
@@ -108,7 +108,7 @@ router.post('/reorder-pages', async function (req, res) {
 
     await sortPages(ids, async function () {
         try {
-            const pages = await Page.find({}).sort({ sorting: 1 }).exec();
+            const pages = await Page.find({}).sort({ sorting: 1}).exec();
             req.app.locals.pages = pages;
         } catch (err) {
             console.log(err);
