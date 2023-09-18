@@ -7,8 +7,9 @@ const adminpages = require("../routes/adminpages_route");
 const admincategory = require("../routes/admincategory_router");
 const fileUpload = require('express-fileupload');
 const adminProducts = require('../routes/adminproduct_router');
+const  products = require("../routes/products_router")
 const Page = require("../models/page")
-
+const Category = require("../models/category")
 const configViewEngine = (app) => {
     //config static files
     app.use(express.static(path.join('src', 'public')));
@@ -56,8 +57,15 @@ const configViewEngine = (app) => {
         console.error(err);
         // Xử lý lỗi nếu cần
     });
-    
-    
+    // Get all categories to pass to header.ejs
+    Category.find({}).sort({ sorting: 1 }).then((categories) => {
+        app.locals.categories = categories;
+    }).catch((err) => {
+        console.error(err);
+        // Xử lý lỗi nếu cần
+    });
+
+
     // Serve static files from the 'public' directory
     app.use(express.static('public'));
 
@@ -69,7 +77,7 @@ const configViewEngine = (app) => {
     app.use('/admin/pages', adminpages);
     app.use('/admin/categories', admincategory);
     app.use('/admin/products', adminProducts);
-
+    app.use('/products', products);
 }
 
 module.exports = configViewEngine;
